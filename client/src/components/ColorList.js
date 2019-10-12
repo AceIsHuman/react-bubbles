@@ -15,6 +15,7 @@ const ColorList = ({ colors, updateColors }) => {
 
   const editColor = color => {
     setEditing(true);
+    setToggleAddNew(false);
     setColorToEdit(color);
   };
 
@@ -145,7 +146,7 @@ const ColorList = ({ colors, updateColors }) => {
             <button onClick={() => setToggleAddNew(false)}>cancel</button>
           </div>
         </form>
-      ) : (
+      ) : !editing && (
         <Button onClick={() => setToggleAddNew(true)}>add color</Button>
       )}
       <div className="spacer" />
