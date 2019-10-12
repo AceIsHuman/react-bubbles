@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Form, Icon, Header } from "semantic-ui-react";
 import { axiosWithAuth } from "../utils/axiosWithAuth";
 
-const Login = () => {
+const Login = props => {
   const [creds, setCreds] = useState({
     username: "",
     password: ""
@@ -23,6 +23,7 @@ const Login = () => {
         localStorage.setItem("token", res.data.payload);
       })
       .catch(err => console.error(err.response));
+    props.history.push('/bubbles');
   };
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
