@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { Button } from "semantic-ui-react";
 import { axiosWithAuth } from "../utils/axiosWithAuth";
 
 const initialColor = {
@@ -10,6 +10,8 @@ const initialColor = {
 const ColorList = ({ colors, updateColors }) => {
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [toggleAddNew, setToggleAddNew] = useState(false);
+  const [newColor, setNewColor] = useState({ ...initialColor });
 
   const editColor = color => {
     setEditing(true);
@@ -47,6 +49,17 @@ const ColorList = ({ colors, updateColors }) => {
       .catch(err => console.error(err.response));
   };
 
+  const addColor = e => {
+    e.preventDefault();
+    axiosWithAuth()
+      .post("/colors", newColor)
+      .then(res => {
+        updateColors(res.data);
+      })
+      .catch(err => console.error(err.response));
+    setToggleAddNew(false);
+  };
+
   return (
     <div className="colors-wrap">
       <p>colors</p>
@@ -54,10 +67,13 @@ const ColorList = ({ colors, updateColors }) => {
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
-              <span className="delete" onClick={e => {
-                e.stopPropagation();
-                deleteColor(color.id)
-              }}>
+              <span
+                className="delete"
+                onClick={e => {
+                  e.stopPropagation();
+                  deleteColor(color.id);
+                }}
+              >
                 x
               </span>{" "}
               {color.color}
@@ -99,8 +115,40 @@ const ColorList = ({ colors, updateColors }) => {
           </div>
         </form>
       )}
-      <div className="spacer" />
       {/* stretch - build another form here to add a color */}
+      {toggleAddNew ? (
+        <form onSubmit={addColor}>
+          <legend>add color</legend>
+          <label>
+            color name:
+            <input
+              onChange={e =>
+                setNewColor({ ...newColor, color: e.target.value })
+              }
+              value={newColor.color}
+            />
+          </label>
+          <label>
+            hex code:
+            <input
+              onChange={e =>
+                setNewColor({
+                  ...newColor,
+                  code: { hex: e.target.value }
+                })
+              }
+              value={newColor.code.hex}
+            />
+          </label>
+          <div className="button-row">
+            <button type="submit">create</button>
+            <button onClick={() => setToggleAddNew(false)}>cancel</button>
+          </div>
+        </form>
+      ) : (
+        <Button onClick={() => setToggleAddNew(true)}>add color</Button>
+      )}
+      <div className="spacer" />
     </div>
   );
 };
