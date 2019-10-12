@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Button, Form, Icon, Header } from "semantic-ui-react";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
 
 const Login = () => {
   const [creds, setCreds] = useState({
-    username: null,
-    password: null
+    username: "",
+    password: ""
   });
 
   const handleChanges = e => {
@@ -13,12 +14,22 @@ const Login = () => {
       [e.target.name]: e.target.value
     });
   };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    axiosWithAuth()
+      .post("/login", creds)
+      .then(res => {
+        localStorage.setItem("token", res.data.payload);
+      })
+      .catch(err => console.error(err.response));
+  };
   // make a post request to retrieve a token from the api
   // when you have handled the token, navigate to the BubblePage route
   return (
     <>
       <h1>Welcome to the Bubble App!</h1>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Header>
           <Icon name="user" />
           User Login
@@ -31,6 +42,7 @@ const Login = () => {
         />
         <Form.Input
           name="password"
+          type="password"
           placeholder="Password"
           value={creds.password}
           onChange={handleChanges}
